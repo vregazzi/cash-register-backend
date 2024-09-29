@@ -1,0 +1,34 @@
+services:
+  api:
+    image: mcr.microsoft.com/devcontainers/dotnet:1-8.0-bookworm
+    volumes:
+      - ../:/src
+    environment:
+      DOTNET_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: Development
+      DB_CONNECTION_STRING: "User ID=postgres;Password=postgres;Host=db;Port=5432;Database=postgres;Pooling=true;Connection Lifetime=0;"
+    command: sleep infinity
+    networks:
+      - cash-register
+  db:
+    image: postgres:14-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres/create-tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    networks:
+      - cash-register
+  adminer:
+    image: adminer
+    ports:
+      - 8085:8080
+    networks:
+      - cash-register
+
+networks:
+  cash-register:
+    external: true
