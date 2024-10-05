@@ -6,10 +6,10 @@ namespace CashRegister.Controllers;
 
 [ApiController]
 [Route("/inventory")]
-public class ArticlesController(ILoggerFactory logger) : Controller
+public class InventoryController(ILoggerFactory logger) : Controller
 {
-    private readonly ILogger<ArticlesController> _logger =
-        logger.CreateLogger<ArticlesController>();
+    private readonly ILogger<InventoryController> _logger =
+        logger.CreateLogger<InventoryController>();
 
     [Route("/status")]
     [HttpGet]
