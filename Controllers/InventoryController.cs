@@ -21,7 +21,7 @@ public class InventoryController(ILoggerFactory logger) : Controller
 
     [Route("/inventory/{id}")]
     [HttpGet]
-    public async Task<IActionResult> Get(Guid id)
+    public async Task<IActionResult> Get(string id)
     {
         using NpgsqlConnection connection = GetConnection();
 
@@ -42,9 +42,9 @@ public class InventoryController(ILoggerFactory logger) : Controller
         MerchandiseItem item =
             new()
             {
-                Id = reader.GetGuid(0),
+                Id = reader.GetString(0),
                 Name = reader.GetString(1),
-                Price = reader.GetInt32(2),
+                Price = reader.GetDecimal(2),
                 Quantity = reader.GetInt32(3),
             };
 
