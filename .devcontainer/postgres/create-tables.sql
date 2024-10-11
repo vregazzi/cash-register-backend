@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS merchandiseItems (
-  id uuid,
+  id varchar(255),
   name varchar(255),
-  price int,
+  price money,
   quantity int,
   PRIMARY KEY (id)
 );
