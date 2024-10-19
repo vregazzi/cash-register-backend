@@ -23,88 +23,35 @@ public class InventoryController(ILoggerFactory logger) : Controller
     [HttpGet]
     public async Task<IActionResult> Get(string id)
     {
+        // open connection to database
         using NpgsqlConnection connection = GetConnection();
 
+        // start command, use parameters for security
         using var command = new NpgsqlCommand(
             "SELECT * FROM merchandiseItems WHERE id=@id;",
             connection
         );
-
         command.Parameters.AddWithValue("id", id);
 
+        // ensure data can be read from query result
         NpgsqlDataReader reader = await command.ExecuteReaderAsync();
-
         if (!reader.Read())
         {
             return NotFound();
         }
 
+        // put data into object to return
         MerchandiseItem item =
             new()
             {
                 Id = reader.GetString(0),
                 Name = reader.GetString(1),
                 Price = reader.GetDecimal(2),
-                Quantity = reader.GetInt32(3),
             };
 
+        // close connection and return object
         connection.Close();
-
         return Json(item);
-    }
-
-    [Route("/inventory")]
-    [HttpPost]
-    public IActionResult Post(MerchandiseItem merchandiseItem)
-    {
-        using NpgsqlConnection connection = GetConnection();
-
-        using var command = new NpgsqlCommand(
-            "INSERT INTO todoItems (id, name, price, quantity) VALUES (@id, @name, @price, @quantity);",
-            connection
-        );
-
-        command.Parameters.AddWithValue("id", Guid.NewGuid());
-        command.Parameters.AddWithValue("name", merchandiseItem.Name);
-        command.Parameters.AddWithValue("price", merchandiseItem.Price);
-        command.Parameters.AddWithValue("quantity", merchandiseItem.Quantity);
-
-        command.ExecuteNonQuery();
-        connection.Close();
-
-        return CreatedAtAction(nameof(Get), new { id = merchandiseItem.Id }, merchandiseItem);
-    }
-
-    [Route("/inventory/{id}")]
-    [HttpPatch]
-    public IActionResult Patch(Guid id, int? quantity, int? price, string? name)
-    {
-        using NpgsqlConnection connection = GetConnection();
-
-        using var command = new NpgsqlCommand(
-            "UPDATE todoItems SET quantity=@price WHERE id=@id;",
-            connection
-        );
-
-        command.Parameters.AddWithValue("id", id);
-
-        if (quantity != null)
-        {
-            command.Parameters.AddWithValue("quantity", quantity);
-        }
-        if (price != null)
-        {
-            command.Parameters.AddWithValue("price", price);
-        }
-        if (name != null)
-        {
-            command.Parameters.AddWithValue("name", name);
-        }
-
-        command.ExecuteNonQuery();
-        connection.Close();
-
-        return Json("");
     }
 
     private static NpgsqlConnection GetConnection()
